@@ -1,0 +1,51 @@
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    public float moveSpeed = 5f;
+    public float mouseSensitivity = 2f;
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+
+    private CharacterController controller;
+    private Camera playerCamera;
+
+    void Start()
+    {
+        controller = GetComponent<CharacterController>();
+        playerCamera = GetComponentInChildren<Camera>();
+        Cursor.lockState = CursorLockMode.Locked; // Lock cursor to center of screen
+    }
+
+    void Update()
+    {
+        // Player movement
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+
+        Vector3 moveDirection = transform.right * moveHorizontal + transform.forward * moveVertical;
+        controller.Move(moveDirection * moveSpeed * Time.deltaTime);
+
+        // Player rotation
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        transform.Rotate(Vector3.up * mouseX);
+
+        Vector3 cameraRotation = playerCamera.transform.rotation.eulerAngles;
+        cameraRotation.x -= mouseY;
+        playerCamera.transform.rotation = Quaternion.Euler(cameraRotation);
+
+        // Shooting
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        // Add logic for bullet behavior, such as velocity, damage, etc.
+    }
+}
